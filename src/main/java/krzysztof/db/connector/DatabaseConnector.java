@@ -34,7 +34,36 @@ public class DatabaseConnector {
     this.dbHost = propertyReader.getProperty("db.host");
   }
 
-  public List<Map<String, String>> select(List<String> values, String entity, String where) {
+  public List<Map<String, String>> select(List<String> values, String entity) {
+
+    String query = String.format("select %s from %s",
+        values.stream().collect(Collectors.joining(",")), entity);
+
+    try (Connection connection = this.generateConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        ResultSet resultSet = preparedStatement.executeQuery()) {
+
+      List<Map<String, String>> result = new ArrayList<>();
+      while (resultSet.next()) {
+        Map<String, String> mappedEntity = new HashMap<>();
+        result.add(mappedEntity);
+        values.forEach(value -> {
+          try {
+            mappedEntity.put(value, resultSet.getString(value));
+          } catch (SQLException e) {
+            e.printStackTrace();
+          }
+        });
+      }
+      return result;
+    } catch (Exception e) {
+      LOGGER.warning(e.getMessage());
+      throw new IllegalArgumentException(e.getMessage());
+    }
+  }
+
+  public List<Map<String, String>> selectWithWhere(List<String> values, String entity,
+      String where) {
 
     String query = String.format("select (%s) from %s where %s",
         values.stream().collect(Collectors.joining(",")), entity, where);
