@@ -97,7 +97,6 @@ public class DatabaseConnector {
       preparedStatement.executeUpdate();
     } catch (Exception e) {
       LOGGER.warning(e.getMessage());
-      throw new IllegalArgumentException(e.getMessage());
     }
   }
 
