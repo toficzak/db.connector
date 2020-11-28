@@ -11,11 +11,20 @@
 	<name>db.connector</name>
 	<url>http://maven.apache.org</url>
 
+
+
 	<properties>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<!-- https://mvnrepository.com/artifact/junit/junit -->
@@ -26,9 +35,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>krzysztof</groupId>
+			<groupId>com.github.toficzak</groupId>
 			<artifactId>property.reader</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>1.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>

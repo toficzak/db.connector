@@ -65,7 +65,7 @@ public class DatabaseConnector {
   public List<Map<String, String>> selectWithWhere(List<String> values, String entity,
       String where) {
 
-    String query = String.format("select (%s) from %s where %s",
+    String query = String.format("select %s from %s where %s",
         values.stream().collect(Collectors.joining(",")), entity, where);
 
     try (Connection connection = this.generateConnection();
