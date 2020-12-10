@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import krzysztof.property.reader.PropertyReader;
@@ -34,39 +35,15 @@ public class DatabaseConnector {
     this.dbHost = propertyReader.getProperty("db.host");
   }
 
-  public List<Map<String, String>> select(List<String> values, String entity) {
+  public List<Map<String, String>> select(List<String> values, String entity,
+      Optional<String> optWhere, Optional<String> optOrderBy, Optional<String> optLimit) {
 
-    String query = String.format("select %s from %s",
-        values.stream().collect(Collectors.joining(",")), entity);
-
-    try (Connection connection = this.generateConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
-        ResultSet resultSet = preparedStatement.executeQuery()) {
-
-      List<Map<String, String>> result = new ArrayList<>();
-      while (resultSet.next()) {
-        Map<String, String> mappedEntity = new HashMap<>();
-        result.add(mappedEntity);
-        values.forEach(value -> {
-          try {
-            mappedEntity.put(value, resultSet.getString(value));
-          } catch (SQLException e) {
-            e.printStackTrace();
-          }
-        });
-      }
-      return result;
-    } catch (Exception e) {
-      LOGGER.warning(e.getMessage());
-      throw new IllegalArgumentException(e.getMessage());
-    }
-  }
-
-  public List<Map<String, String>> selectWithWhere(List<String> values, String entity,
-      String where) {
-
-    String query = String.format("select %s from %s where %s",
-        values.stream().collect(Collectors.joining(",")), entity, where);
+    String query = String.format("select %s from %s where %s %s %s",
+        values.stream().collect(Collectors.joining(",")),
+        entity,
+        optWhere.orElse(""),
+        optOrderBy.orElse(""),
+        optLimit.orElse(""));
 
     try (Connection connection = this.generateConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -90,6 +67,7 @@ public class DatabaseConnector {
       throw new IllegalArgumentException(e.getMessage());
     }
   }
+
 
   public void update(String query) {
     try (Connection connection = this.generateConnection();
