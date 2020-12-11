@@ -38,15 +38,24 @@ public class DatabaseConnector {
   public List<Map<String, String>> select(List<String> values, String entity,
       Optional<String> optWhere, Optional<String> optOrderBy, Optional<String> optLimit) {
 
-    String query = String.format("select %s from %s where %s %s %s",
+    StringBuilder queryBuilder = new StringBuilder(String.format("select %s from %s",
         values.stream().collect(Collectors.joining(",")),
-        entity,
-        optWhere.orElse(""),
-        optOrderBy.orElse(""),
-        optLimit.orElse(""));
+        entity));
+
+    if (optWhere.isPresent()) {
+      queryBuilder.append(String.format(" where %s", optWhere.get()));
+    }
+
+    if (optOrderBy.isPresent()) {
+      queryBuilder.append(String.format(" order by %s", optOrderBy.get()));
+    }
+
+    if (optLimit.isPresent()) {
+      queryBuilder.append(String.format(" limit %s", optLimit.get()));
+    }
 
     try (Connection connection = this.generateConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(query);
+        PreparedStatement preparedStatement = connection.prepareStatement(queryBuilder.toString());
         ResultSet resultSet = preparedStatement.executeQuery()) {
 
       List<Map<String, String>> result = new ArrayList<>();
